@@ -103,7 +103,7 @@ async def scan(files: list[UploadFile]) -> list[ReceiptResult]:
                                 "For category, make a best guess (e.g. Groceries, Dining, Transport, Healthcare, Shopping). "
                                 "For date, extract the date of transaction on the receipt. "
                                 "Date format on the receipt may be MM/DD/YYYY, DD/MM/YYYY or similar — convert to ISO format (YYYY-MM-DD). "
-                                "For time, extract the time of transaction on the receipt. "
+                                "For time, extract the time of transaction on the receipt and return it in HH:MM format (24-hour, no seconds, no timezone offset). "
                                 "For address, combine all address parts (street, city, state, country, postal code) into a single string. "
                                 "If a value is not visible, return null."
                             ),
