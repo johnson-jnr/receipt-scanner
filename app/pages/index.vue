@@ -1,7 +1,7 @@
 <template>
     <!-- <div>Content page</div> -->
     <UFileUpload
-        v-model="files"
+        v-model="localFiles"
         multiple
         accept="image/*"
         label="Drop your Recept here"
@@ -18,13 +18,14 @@
             />
         </template> -->
 
-        <template #files-bottom="{ removeFile, files }">
-            <!-- <UButton v-if="value" label="Remove all files" color="neutral" @click="removeFile()" />
-            <p>Length is: {{ files.length }}</p> -->
-            <!-- <div v-if="value">
-                <img class="w-full max-h-" :src="createObjectUrl(value)" />
-            </div> -->
-        </template>
+        <!-- <template #files-bottom="{ removeFile, files }">
+            <UButton
+                v-if="files?.length"
+                label="Remove all files"
+                color="neutral"
+                @click="removeFile()"
+            />
+        </template> -->
 
         <template #files="{ files }">
             <UModal v-for="(file, index) in files" :key="file.name">
@@ -100,19 +101,33 @@
             </div> -->
         </template>
     </UFileUpload>
+
+    <UButton @click="scanReceipt" class="mt-8" color="neutral" v-if="localFiles.length">
+        Scan Receipt
+    </UButton>
 </template>
 
 <script setup lang="ts">
-const files = ref<File[]>([]);
+const localFiles = ref<File[]>([]);
 const openFileModal = ref(false);
 
 function removeFileAt(index: number) {
-    if (files.value.length) {
-        files.value.splice(index, 1);
+    if (localFiles.value.length) {
+        localFiles.value.splice(index, 1);
     }
 }
 
-const viewFile = () => {};
+const scanReceipt = async () => {
+    const form = new FormData();
+    localFiles.value.forEach((file) => form.append("files", file));
+
+    const result = await $fetch("/api/scan", {
+        method: "POST",
+        body: form,
+    });
+
+    console.log(result);
+};
 </script>
 
 <style scoped></style>

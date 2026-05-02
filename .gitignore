@@ -6,6 +6,12 @@
 .cache
 dist
 
+# Fastapi
+__pycache__/
+**/__pycache__/
+*.pyc
+.venv/
+
 # Node dependencies
 node_modules
 
