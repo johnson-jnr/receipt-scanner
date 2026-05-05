@@ -1,5 +1,4 @@
 <template>
-    <!-- <div>Content page</div> -->
     <UFileUpload
         v-model="localFiles"
         multiple
@@ -8,25 +7,6 @@
         class="w-96 min-h-48"
         layout="list"
     >
-        <!-- <template #actions="{ open }">
-            <UButton
-                label="Select images"
-                icon="i-lucide-upload"
-                color="neutral"
-                variant="outline"
-                @click="open()"
-            />
-        </template> -->
-
-        <!-- <template #files-bottom="{ removeFile, files }">
-            <UButton
-                v-if="files?.length"
-                label="Remove all files"
-                color="neutral"
-                @click="removeFile()"
-            />
-        </template> -->
-
         <template #files="{ files }">
             <UModal v-for="(file, index) in files" :key="file.name">
                 <div
@@ -68,41 +48,6 @@
                     </div>
                 </template>
             </UModal>
-            <!-- <div
-                v-for="(file, index) in files"
-                :key="file.name"
-                data-slot="file"
-                class="hover:bg-neutral-50 relative text-xs px-2.5 py-1.5 gap-1.5 min-w-0 flex items-center border border-default rounded-md w-full"
-            >
-                <UAvatar
-                    :as="{ img: 'img' }"
-                    :src="createObjectUrl(file)"
-                    :icon="'i-lucide-file'"
-                    data-slot="fileLeadingAvatar"
-                />
-
-                <div
-                    @click="viewFile(file)"
-                    data-slot="fileWrapper"
-                    class="flex flex-col min-w-0 flex-1"
-                >
-                    <span data-slot="fileName" class="truncate text-sm font-medium">
-                        {{ file.name }}
-                    </span>
-                    <span data-slot="fileSize" class="text-xs text-muted">
-                        {{ formatFileSize(file.size) }}
-                    </span>
-                </div>
-
-                <UButton
-                    color="neutral"
-                    variant="link"
-                    :trailing-icon="'i-lucide-x'"
-                    :aria-label="`Remove ${file.name}`"
-                    data-slot="fileTrailingButton"
-                    @click.stop.prevent="removeFileAt(index)"
-                />
-            </div> -->
         </template>
     </UFileUpload>
 
@@ -145,7 +90,11 @@ const UInput = resolveComponent('UInput');
 const UButton = resolveComponent('UButton');
 
 const expanded = ref({});
-let expenses = ref([]);
+import type { Expense, Item } from '~~/shared/types/db';
+
+type ExpenseWithItems = Expense & { items: Item[] };
+
+let expenses = ref<ExpenseWithItems[]>([]);
 
 const data = ref([
     { name: 'John Doe', email: 'john@example.com', amount: 100 },
@@ -174,7 +123,7 @@ const columns = [
     {
         accessorKey: 'merchant',
         header: 'Merchant',
-        cell: ({ row }: { row: { original: { merchant: string } } }) => {
+        cell: ({ row }: { row: { original: { merchant: string | null } } }) => {
             return h(UInput, {
                 class: 'w-full',
                 modelValue: row.original.merchant,
@@ -187,7 +136,7 @@ const columns = [
     {
         accessorKey: 'category',
         header: 'Category',
-        cell: ({ row }: { row: { original: { category: string } } }) => {
+        cell: ({ row }: { row: { original: { category: string | null } } }) => {
             return h(UInput, {
                 class: 'w-full',
                 modelValue: row.original.category,
@@ -200,7 +149,7 @@ const columns = [
     {
         accessorKey: 'address',
         header: 'Address',
-        cell: ({ row }: { row: { original: { address: string } } }) => {
+        cell: ({ row }: { row: { original: { address: string | null } } }) => {
             return h(UInput, {
                 class: 'w-full',
                 modelValue: row.original.address,
@@ -213,7 +162,7 @@ const columns = [
     {
         accessorKey: 'date',
         header: 'Date',
-        cell: ({ row }: { row: { original: { date: string } } }) => {
+        cell: ({ row }: { row: { original: { date: string | null } } }) => {
             return h(UInput, {
                 class: 'w-full',
                 modelValue: row.original.date,
@@ -227,7 +176,7 @@ const columns = [
     {
         accessorKey: 'time',
         header: 'Time',
-        cell: ({ row }: { row: { original: { time: string } } }) => {
+        cell: ({ row }: { row: { original: { time: string | null } } }) => {
             return h(UInput, {
                 class: 'w-full',
                 modelValue: row.original.time?.slice(0, 5),
@@ -241,7 +190,7 @@ const columns = [
     {
         accessorKey: 'total',
         header: 'Total',
-        cell: ({ row }: { row: { original: { total: number } } }) => {
+        cell: ({ row }: { row: { original: { total: number | null } } }) => {
             return h(UInput, {
                 class: 'w-full',
                 modelValue: row.original.total,
@@ -270,7 +219,7 @@ const itemColumns = [
     {
         accessorKey: 'quantity',
         header: 'Qty',
-        cell: ({ row }: { row: { original: { quantity: number } } }) =>
+        cell: ({ row }: { row: { original: { quantity: number | null } } }) =>
             h(UInput, {
                 class: 'w-full',
                 modelValue: row.original.quantity,
@@ -283,7 +232,7 @@ const itemColumns = [
     {
         accessorKey: 'price',
         header: 'Price',
-        cell: ({ row }: { row: { original: { price: number } } }) =>
+        cell: ({ row }: { row: { original: { price: number | null } } }) =>
             h(UInput, {
                 class: 'w-full',
                 modelValue: row.original.price,
@@ -310,7 +259,7 @@ const scanReceipt = async () => {
         body: form,
     });
 
-    expenses.value = result;
+    expenses.value = result as ExpenseWithItems[];
     console.log(result);
 };
 
@@ -319,8 +268,6 @@ const saveExpense = async () => {
         method: 'POST',
         body: expenses.value,
     });
-
-    console.log(result);
 };
 </script>
 
