@@ -100,7 +100,7 @@ async def scan(files: list[UploadFile]) -> list[ReceiptResult]:
                             "type": "text",
                             "text": (
                                 "Extract the receipt details from this image. "
-                                "For category, make a best guess (e.g. Groceries, Dining, Transport, Healthcare, Shopping). "
+                                "For category, make a best guess (e.g. Groceries, Dining, Transport, Healthcare, Shopping). If unsure, return 'Uncategorized'. "
                                 "For date, extract the date of transaction on the receipt. "
                                 "Date format on the receipt may be MM/DD/YYYY, DD/MM/YYYY or similar — convert to ISO format (YYYY-MM-DD). "
                                 "For time, extract the time of transaction on the receipt and return it in HH:MM format (24-hour, no seconds, no timezone offset). "
