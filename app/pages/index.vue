@@ -104,7 +104,7 @@ const data = ref([
 const columns = [
     {
         id: 'expand',
-        cell: ({ row }) =>
+        cell: ({ row }: { row: any }) =>
             h(UButton, {
                 color: 'neutral',
                 variant: 'ghost',
