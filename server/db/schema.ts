@@ -17,6 +17,7 @@ export const expenses = sqliteTable('expenses', {
     category: text(),
     date: text(),
     time: text(),
+    receiptImagePath: text(),
     ...timestamps
 })
 

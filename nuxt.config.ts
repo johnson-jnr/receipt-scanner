@@ -8,6 +8,10 @@ export default defineNuxtConfig({
         db: {
             dialect: 'sqlite',
             casing: 'snake_case'
+        },
+        blob: {
+            driver: 'fs',
+            dir: '.data/blob'
         }
     },
     devtools: { enabled: true },

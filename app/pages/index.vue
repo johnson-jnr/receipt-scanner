@@ -254,7 +254,7 @@ const scanReceipt = async () => {
     const form = new FormData();
     localFiles.value.forEach((file) => form.append('files', file));
 
-    const result = await $fetch('/api/scan', {
+    const result = await $fetch('/api/receipts/scan', {
         method: 'POST',
         body: form,
     });
@@ -264,10 +264,17 @@ const scanReceipt = async () => {
 };
 
 const saveExpense = async () => {
-    const result = await $fetch('/api/expense', {
-        method: 'POST',
-        body: expenses.value,
-    });
+    const form = new FormData();
+    localFiles.value.forEach((file) => form.append('files', file));
+
+    const blobs = await $fetch('/api/receipts/upload', { method: 'POST', body: form });
+
+    const expensesWithImages = expenses.value.map((expense, i) => ({
+        ...expense,
+        receiptImagePath: blobs[i]?.pathname ?? null,
+    }));
+
+    await $fetch('/api/expenses', { method: 'POST', body: expensesWithImages });
 };
 </script>
 
