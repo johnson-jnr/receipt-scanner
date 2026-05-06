@@ -1,4 +1,7 @@
-import { expenses, items } from '@nuxthub/db/schema'
+import { expenses, items, users } from '@nuxthub/db/schema'
+
+export type User = typeof users.$inferSelect
+export type NewUser = typeof users.$inferInsert
 
 export type Expense = typeof expenses.$inferSelect
 export type Item = typeof items.$inferSelect

@@ -3,14 +3,22 @@ import { relations } from 'drizzle-orm'
 
 // columns.helpers.ts
 const timestamps = {
-    updatedAt: integer({ mode: 'timestamp' }),
+    updatedAt: integer({ mode: 'timestamp' }).$onUpdateFn(() => new Date()),
     createdAt: integer({ mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
-    deletedAt: integer({ mode: 'timestamp' }),
 }
+
+//users table
+export const users = sqliteTable('users', {
+    id: integer().primaryKey({ autoIncrement: true }),
+    email: text().notNull().unique(),
+    password: text().notNull(),
+    ...timestamps
+})
 
 //expenses table
 export const expenses = sqliteTable('expenses', {
     id: integer().primaryKey({ autoIncrement: true }),
+    userId: integer().notNull().references(() => users.id),
     merchant: text(),
     address: text(),
     total: real(),
@@ -31,7 +39,15 @@ export const items = sqliteTable('items', {
     ...timestamps
 })
 
-export const expensesRelations = relations(expenses, ({ many }) => ({
+export const usersRelations = relations(users, ({ many }) => ({
+    expenses: many(expenses),
+}))
+
+export const expensesRelations = relations(expenses, ({ one, many }) => ({
+    user: one(users, {
+        fields: [expenses.userId],
+        references: [users.id],
+    }),
     items: many(items),
 }))
 
