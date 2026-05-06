@@ -1,8 +1,19 @@
 <template>
-    <div>dashboard</div>
+    <div>Welcome, {{ user?.email }}</div>
+    <UButton @click="logout">Logout</UButton>
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+    middleware: ['auth'],
+});
+
+const { user, clear } = useUserSession();
+
+async function logout() {
+    await clear();
+    await navigateTo('/auth');
+}
 const { data: expenses, status, error } = await useFetch('/api/expenses');
 
 const totalSpent = computed(() => {
