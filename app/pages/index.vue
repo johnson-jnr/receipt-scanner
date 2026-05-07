@@ -79,6 +79,14 @@
         </UTable>
 
         <UButton @click="saveExpense" class="mt-8" color="neutral"> Save Expense </UButton>
+        <UButton
+            @click="scanReceipt"
+            class="ml-2 mt-8"
+            color="neutral"
+            v-if="localFiles.length && expenses.length"
+        >
+            Rescan
+        </UButton>
     </template>
 </template>
 
