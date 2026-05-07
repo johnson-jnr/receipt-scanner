@@ -9,6 +9,7 @@
         </template>
 
         <template #body>
+            <!-- Expenses Stats -->
             <div class="p-4">
                 <UPageGrid class="lg:grid-cols-3 gap-4">
                     <UPageCard
@@ -19,7 +20,8 @@
                         :ui="{
                             container: 'gap-y-1.5',
                             wrapper: 'items-start',
-                            leading: 'p-2.5 rounded-full bg-primary/10 ring ring-inset ring-primary/25',
+                            leading:
+                                'p-2.5 rounded-full bg-primary/10 ring ring-inset ring-primary/25',
                             title: 'font-normal text-muted text-xs uppercase',
                         }"
                     >
@@ -36,7 +38,8 @@
                         :ui="{
                             container: 'gap-y-1.5',
                             wrapper: 'items-start',
-                            leading: 'p-2.5 rounded-full bg-primary/10 ring ring-inset ring-primary/25',
+                            leading:
+                                'p-2.5 rounded-full bg-primary/10 ring ring-inset ring-primary/25',
                             title: 'font-normal text-muted text-xs uppercase',
                         }"
                     >
@@ -53,7 +56,8 @@
                         :ui="{
                             container: 'gap-y-1.5',
                             wrapper: 'items-start',
-                            leading: 'p-2.5 rounded-full bg-primary/10 ring ring-inset ring-primary/25',
+                            leading:
+                                'p-2.5 rounded-full bg-primary/10 ring ring-inset ring-primary/25',
                             title: 'font-normal text-muted text-xs uppercase',
                         }"
                     >
@@ -63,11 +67,47 @@
                     </UPageCard>
                 </UPageGrid>
             </div>
+
+            <!-- Category Breakdown -->
+            <div class="px-4 pb-4">
+                <UCard :ui="{ root: 'overflow-auto', body: 'px-0! py-0!' }">
+                    <template #header>
+                        <p class="text-base font-semibold text-highlighted">Spending by Category</p>
+                    </template>
+
+                    <div class="flex items-center justify-center gap-8 px-4 py-4">
+                        <div class="size-56">
+                            <VisSingleContainer :data="categoryData" class="size-56">
+                                <VisDonut
+                                    :value="(d: CategoryData) => d.total"
+                                    :central-label="topCategoryPercent"
+                                    :central-sub-label="topCategory ?? ''"
+                                />
+                                <VisTooltip :triggers="triggers" />
+                            </VisSingleContainer>
+                        </div>
+
+                        <ul class="flex flex-col gap-3">
+                            <li v-for="item in categoryData" :key="item.category" class="text-sm">
+                                <span class="text-default font-medium">{{ item.category }}</span>
+                                <span class="text-muted">
+                                    — ${{ item.total.toFixed(2) }} ({{
+                                        Math.round((item.total / totalSpent) * 100)
+                                    }}%)
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </UCard>
+            </div>
         </template>
     </UDashboardPanel>
 </template>
 
 <script setup lang="ts">
+import { VisSingleContainer, VisDonut, VisTooltip } from '@unovis/vue';
+import { Donut } from '@unovis/ts';
+
 definePageMeta({
     // middleware: ['auth'],
     layout: 'dashboard',
@@ -79,14 +119,17 @@ async function logout() {
     await clear();
     await navigateTo('/auth');
 }
+
 const { data: expenses, status, error } = await useFetch('/api/expenses');
 
-const totalSpent = computed(() => {
-    return expenses.value?.reduce((acc, curr) => acc + (curr.total ?? 0), 0) ?? 0;
-});
+const totalSpent = computed(
+    () => expenses.value?.reduce((acc, curr) => acc + (curr.total ?? 0), 0) ?? 0,
+);
 
-const topCategory = computed(() => {
-    if (!expenses.value?.length) return null;
+type CategoryData = { category: string; total: number };
+
+const categoryData = computed<CategoryData[]>(() => {
+    if (!expenses.value?.length) return [];
 
     const totals = expenses.value.reduce(
         (acc, curr) => {
@@ -97,8 +140,26 @@ const topCategory = computed(() => {
         {} as Record<string, number>,
     );
 
-    return Object.entries(totals).sort(([, a], [, b]) => b - a)[0]?.[0] ?? null;
+    return Object.entries(totals)
+        .map(([category, total]) => ({ category, total }))
+        .sort((a, b) => b.total - a.total);
 });
+
+const topCategory = computed(() => categoryData.value[0]?.category ?? null);
+
+const topCategoryPercent = computed(() => {
+    if (!categoryData.value.length || !totalSpent.value) return '';
+    const pct = (categoryData.value[0]!.total / totalSpent.value) * 100;
+    return `${Math.round(pct)}%`;
+});
+
+const triggers = {
+    [Donut.selectors.segment]: (d: { data: CategoryData }) => d.data.category,
+};
 </script>
 
-<style scoped></style>
+<style scoped>
+.unovis-single-container {
+    --vis-donut-central-label-font-size: 22px;
+}
+</style>
