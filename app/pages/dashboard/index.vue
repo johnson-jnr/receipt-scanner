@@ -100,6 +100,26 @@
                     </div>
                 </UCard>
             </div>
+
+            <!-- Expenses Table -->
+            <div class="px-4 pb-4">
+                <UCard>
+                    <template #header>
+                        <p class="text-base font-semibold text-highlighted">Expenses</p>
+                    </template>
+                    <UTable
+                        :data="expenses ?? []"
+                        :columns="expenseColumns"
+                        :ui="{
+                            base: 'table-fixed border-separate border-spacing-0',
+                            thead: '[&>tr]:bg-elevated/50 [&>tr]:after:content-none',
+                            tbody: '[&>tr]:last:[&>td]:border-b-0',
+                            th: 'first:rounded-l-lg last:rounded-r-lg border-y border-default first:border-l last:border-r',
+                            td: 'border-b border-default',
+                        }"
+                    />
+                </UCard>
+            </div>
         </template>
     </UDashboardPanel>
 </template>
@@ -156,6 +176,46 @@ const topCategoryPercent = computed(() => {
 const triggers = {
     [Donut.selectors.segment]: (d: { data: CategoryData }) => d.data.category,
 };
+
+const expenseColumns = [
+    {
+        accessorKey: 'merchant',
+        header: 'Merchant',
+        cell: ({ row }: { row: any }) => row.getValue('merchant') ?? '—',
+    },
+    {
+        accessorKey: 'category',
+        header: 'Category',
+        cell: ({ row }: { row: any }) => row.getValue('category') ?? '—',
+    },
+    {
+        accessorKey: 'date',
+        header: 'Date',
+        cell: ({ row }: { row: any }) => row.getValue('date') ?? '—',
+    },
+    {
+        accessorKey: 'time',
+        header: 'Time',
+        cell: ({ row }: { row: any }) => row.getValue('time')?.slice(0, 5) ?? '—',
+    },
+    {
+        accessorKey: 'address',
+        header: 'Address',
+        cell: ({ row }: { row: any }) => row.getValue('address') ?? '—',
+    },
+    {
+        accessorKey: 'total',
+        header: () => h('div', { class: 'text-right' }, 'Total'),
+        cell: ({ row }: { row: any }) => {
+            const total = row.getValue('total') as number | null;
+            return h(
+                'div',
+                { class: 'text-right font-medium' },
+                total != null ? `$${total.toFixed(2)}` : '—',
+            );
+        },
+    },
+];
 </script>
 
 <style scoped>
