@@ -66,35 +66,40 @@ async function onLogin(event: FormSubmitEvent<Schema>) {
 </script>
 
 <template>
-    <div class="max-w-sm">
-        <div v-if="formError" class="text-sm text-red-500 mb-4">{{ formError }}</div>
-        <UTabs :items="items">
-            <template #register>
-                <UForm :schema="schema" :state="state" class="space-y-4" @submit="onRegister">
-                    <UFormField label="Email" name="email">
-                        <UInput class="w-full" v-model="state.email" />
-                    </UFormField>
+    <div class="h-10/12 flex items-center">
+        <div class="max-w-sm mx-auto w-full">
+            <div v-if="formError" class="text-sm text-red-500 mb-4">{{ formError }}</div>
+            <UTabs :items="items">
+                <template #register>
+                    <UForm :schema="schema" :state="state" class="space-y-4" @submit="onRegister">
+                        <UFormField label="Email" name="email">
+                            <UInput class="w-full" v-model="state.email" />
+                        </UFormField>
 
-                    <UFormField label="Password" name="password">
-                        <UInput class="w-full" v-model="state.password" type="password" />
-                    </UFormField>
+                        <UFormField label="Password" name="password">
+                            <UInput class="w-full" v-model="state.password" type="password" />
+                        </UFormField>
 
-                    <UButton class="w-24 justify-center" type="submit"> Submit </UButton>
-                </UForm>
-            </template>
-            <template #login>
-                <UForm :schema="schema" :state="state" class="space-y-4" @submit="onLogin">
-                    <UFormField label="Email" name="email">
-                        <UInput class="w-full" v-model="state.email" />
-                    </UFormField>
+                        <UButton class="w-full justify-center" type="submit"> Submit </UButton>
+                    </UForm>
+                </template>
+                <template #login>
+                    <UForm :schema="schema" :state="state" class="space-y-4" @submit="onLogin">
+                        <UFormField label="Email" name="email">
+                            <UInput class="w-full" v-model="state.email" />
+                        </UFormField>
 
-                    <UFormField label="Password" name="password">
-                        <UInput class="w-full" v-model="state.password" type="password" />
-                    </UFormField>
+                        <UFormField label="Password" name="password">
+                            <UInput class="w-full" v-model="state.password" type="password" />
+                        </UFormField>
 
-                    <UButton class="w-24 justify-center" type="submit"> Submit </UButton>
-                </UForm>
-            </template>
-        </UTabs>
+                        <UButton class="w-full justify-center" type="submit"> Submit </UButton>
+                    </UForm>
+                </template>
+            </UTabs>
+            <div class="mt-4 text-center">
+                <UButton variant="ghost" @click="navigateTo('/dashboard')">See Demo</UButton>
+            </div>
+        </div>
     </div>
 </template>

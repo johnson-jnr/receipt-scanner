@@ -1,7 +1,7 @@
 <template>
-    <div class="p-4 border-t border-t-stone-200 text-center">
-        {{ new Date().getFullYear() }} - Johnson Towoju
-    </div>
+    <footer class="p-4 border-t border-t-stone-200 text-center">
+        {{ new Date().getFullYear() }} - Receipt Scanner
+    </footer>
 </template>
 
 <script setup lang="ts"></script>
