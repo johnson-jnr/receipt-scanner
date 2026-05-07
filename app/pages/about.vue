@@ -1,60 +1,102 @@
 <script setup lang="ts">
-import { h, resolveComponent, ref } from 'vue';
-// import type { ColumnDef } from '@tanstack/vue-table'
+import type { NavigationMenuItem } from '@nuxt/ui';
 
-const UInput = resolveComponent('UInput');
-
-const data = ref([
-    { id: 1, name: 'John Doe', email: 'john@example.com', amount: 100 },
-    { id: 2, name: 'Jane Smith', email: 'jane@example.com', amount: 200 },
-]);
-
-const columns = [
-    {
-        accessorKey: 'name',
-        header: 'Name',
-        cell: ({ row }: { row: { original: { name: string } } }) => {
-            return h(UInput, {
-                class: 'w-full',
-                modelValue: row.original.name,
-                'onUpdate:modelValue': (value: string) => {
-                    row.original.name = value;
-                },
-            });
+const items: NavigationMenuItem[][] = [
+    [
+        {
+            label: 'Home',
+            icon: 'i-lucide-house',
+            active: true,
         },
-    },
-    {
-        accessorKey: 'email',
-        header: 'Email',
-        cell: ({ row }: { row: { original: { email: string } } }) => {
-            return h(UInput, {
-                class: 'w-full',
-                modelValue: row.original.email,
-                type: 'email',
-                'onUpdate:modelValue': (value: string) => {
-                    row.original.email = value;
-                },
-            });
+        {
+            label: 'Inbox',
+            icon: 'i-lucide-inbox',
+            badge: '4',
         },
-    },
-    {
-        accessorKey: 'amount',
-        header: 'Amount',
-        cell: ({ row }: { row: { original: { amount: number } } }) => {
-            return h(UInput, {
-                class: 'w-full',
-                modelValue: row.original.amount,
-                type: 'number',
-                'onUpdate:modelValue': (value: string | number) => {
-                    const next = typeof value === 'number' ? value : Number(value);
-                    row.original.amount = Number.isFinite(next) ? next : 0;
-                },
-            });
+        {
+            label: 'Contacts',
+            icon: 'i-lucide-users',
         },
-    },
+        {
+            label: 'Settings',
+            icon: 'i-lucide-settings',
+            defaultOpen: true,
+            children: [
+                {
+                    label: 'General',
+                },
+                {
+                    label: 'Members',
+                },
+                {
+                    label: 'Notifications',
+                },
+            ],
+        },
+    ],
+    [
+        {
+            label: 'Feedback',
+            icon: 'i-lucide-message-circle',
+            to: 'https://github.com/nuxt-ui-templates/dashboard',
+            target: '_blank',
+        },
+        {
+            label: 'Help & Support',
+            icon: 'i-lucide-info',
+            to: 'https://github.com/nuxt/ui',
+            target: '_blank',
+        },
+    ],
 ];
 </script>
 
 <template>
-    <UTable :data="data" :columns="columns" :ui="{ td: 'p-1!' }" />
+    <UDashboardSidebar collapsible resizable :ui="{ footer: 'border-t border-default' }">
+        <template #header="{ collapsed }">
+            <Logo v-if="!collapsed" class="h-5 w-auto shrink-0" />
+            <UIcon v-else name="i-simple-icons-nuxtdotjs" class="size-5 text-primary mx-auto" />
+        </template>
+
+        <template #default="{ collapsed }">
+            <UButton
+                :label="collapsed ? undefined : 'Search...'"
+                icon="i-lucide-search"
+                color="neutral"
+                variant="outline"
+                block
+                :square="collapsed"
+            >
+                <template v-if="!collapsed" #trailing>
+                    <div class="flex items-center gap-0.5 ms-auto">
+                        <UKbd value="meta" variant="subtle" />
+                        <UKbd value="K" variant="subtle" />
+                    </div>
+                </template>
+            </UButton>
+
+            <UNavigationMenu :collapsed="collapsed" :items="items[0]" orientation="vertical" />
+
+            <UNavigationMenu
+                :collapsed="collapsed"
+                :items="items[1]"
+                orientation="vertical"
+                class="mt-auto"
+            />
+        </template>
+
+        <template #footer="{ collapsed }">
+            <UButton
+                :avatar="{
+                    src: 'https://github.com/benjamincanac.png',
+                    loading: 'lazy' as const,
+                }"
+                :label="collapsed ? undefined : 'Benjamin'"
+                color="neutral"
+                variant="ghost"
+                class="w-full"
+                :block="collapsed"
+            />
+        </template>
+    </UDashboardSidebar>
 </template>

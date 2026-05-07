@@ -1,11 +1,23 @@
 <template>
-    <div>Welcome, {{ user?.email }}</div>
-    <UButton @click="logout">Logout</UButton>
+    <UDashboardPanel id="dashboard">
+        <template #header>
+            <UDashboardNavbar title="Dashboard">
+                <template #leading>
+                    <UDashboardSidebarCollapse />
+                </template>
+            </UDashboardNavbar>
+        </template>
+
+        <template #body>
+            <div class="h-full">foo</div>
+        </template>
+    </UDashboardPanel>
 </template>
 
 <script setup lang="ts">
 definePageMeta({
-    middleware: ['auth'],
+    // middleware: ['auth'],
+    layout: 'dashboard',
 });
 
 const { user, clear } = useUserSession();
