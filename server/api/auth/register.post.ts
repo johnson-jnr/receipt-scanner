@@ -19,5 +19,13 @@ export default defineEventHandler(async (event) => {
         .values({ name, email, password: hashed })
         .returning({ id: schema.users.id, email: schema.users.email, name: schema.users.name })
 
+    if (!user) {
+        throw createError({ statusCode: 500, message: 'Failed to create user' })
+    }
+
+    await setUserSession(event, {
+        user: { id: user.id, email: user.email, name: user.name },
+    })
+
     return user
 })

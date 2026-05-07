@@ -2,6 +2,12 @@ import { db, schema } from '@nuxthub/db'
 import type { NewExpense, NewItem } from '~~/shared/types/db'
 
 export default defineEventHandler(async (event) => {
+    const { user } = await getUserSession(event)
+
+    if (!user) {
+        throw createError({ statusCode: 401, message: 'Unauthorized' })
+    }
+
     const expenses = await readBody<(NewExpense & { items: NewItem[] })[]>(event)
 
     try {
@@ -10,7 +16,7 @@ export default defineEventHandler(async (event) => {
 
             const [inserted] = await db
                 .insert(schema.expenses)
-                .values(expenseData)
+                .values({ ...expenseData, userId: user.id })
                 .returning()
 
             if (items?.length && inserted) {

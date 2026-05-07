@@ -9,7 +9,60 @@
         </template>
 
         <template #body>
-            <div class="h-full">foo</div>
+            <div class="p-4">
+                <UPageGrid class="lg:grid-cols-3 gap-4">
+                    <UPageCard
+                        icon="i-lucide-circle-dollar-sign"
+                        title="Total Spent"
+                        variant="subtle"
+                        class="hover:bg-elevated transition-colors"
+                        :ui="{
+                            container: 'gap-y-1.5',
+                            wrapper: 'items-start',
+                            leading: 'p-2.5 rounded-full bg-primary/10 ring ring-inset ring-primary/25',
+                            title: 'font-normal text-muted text-xs uppercase',
+                        }"
+                    >
+                        <span class="text-2xl font-semibold text-highlighted">
+                            ${{ totalSpent.toFixed(2) }}
+                        </span>
+                    </UPageCard>
+
+                    <UPageCard
+                        icon="i-lucide-receipt-text"
+                        title="Receipts Scanned"
+                        variant="subtle"
+                        class="hover:bg-elevated transition-colors"
+                        :ui="{
+                            container: 'gap-y-1.5',
+                            wrapper: 'items-start',
+                            leading: 'p-2.5 rounded-full bg-primary/10 ring ring-inset ring-primary/25',
+                            title: 'font-normal text-muted text-xs uppercase',
+                        }"
+                    >
+                        <span class="text-2xl font-semibold text-highlighted">
+                            {{ expenses?.length ?? 0 }}
+                        </span>
+                    </UPageCard>
+
+                    <UPageCard
+                        icon="i-lucide-tag"
+                        title="Top Category"
+                        variant="subtle"
+                        class="hover:bg-elevated transition-colors"
+                        :ui="{
+                            container: 'gap-y-1.5',
+                            wrapper: 'items-start',
+                            leading: 'p-2.5 rounded-full bg-primary/10 ring ring-inset ring-primary/25',
+                            title: 'font-normal text-muted text-xs uppercase',
+                        }"
+                    >
+                        <span class="text-2xl font-semibold text-highlighted">
+                            {{ topCategory ?? '—' }}
+                        </span>
+                    </UPageCard>
+                </UPageGrid>
+            </div>
         </template>
     </UDashboardPanel>
 </template>

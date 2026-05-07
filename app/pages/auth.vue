@@ -2,24 +2,27 @@
 import * as z from 'zod';
 import type { FormSubmitEvent, TabsItem } from '@nuxt/ui';
 
-const schema = z.object({
+const loginSchema = z.object({
     email: z.email('Invalid email'),
     password: z.string('Password is required').min(6, 'Must be at least 6 characters'),
+});
+
+const registerSchema = loginSchema.extend({
     name: z.string('Name is required').min(2, 'Too short!'),
 });
 
-type Schema = z.output<typeof schema>;
+type LoginSchema = z.output<typeof loginSchema>;
+type RegisterSchema = z.output<typeof registerSchema>;
 
-const registerForm = reactive<Partial<Schema>>({
+const registerForm = reactive<Partial<RegisterSchema>>({
     email: undefined,
     password: undefined,
     name: undefined,
 });
 
-const loginForm = reactive<Partial<Schema>>({
+const loginForm = reactive<Partial<LoginSchema>>({
     email: undefined,
     password: undefined,
-    name: undefined,
 });
 
 const items: TabsItem[] = [
@@ -36,7 +39,7 @@ const items: TabsItem[] = [
 const toast = useToast();
 const formError = ref<string | null>(null);
 
-async function onRegister(event: FormSubmitEvent<Schema>) {
+async function onRegister(event: FormSubmitEvent<RegisterSchema>) {
     formError.value = null;
 
     try {
@@ -51,22 +54,21 @@ async function onRegister(event: FormSubmitEvent<Schema>) {
             color: 'success',
         });
 
-        await navigateTo('/dashboard');
+        await navigateTo('/dashboard/upload');
     } catch (err: any) {
         formError.value = err.data?.message;
     }
 }
 
-async function onLogin(event: FormSubmitEvent<Schema>) {
+async function onLogin(event: FormSubmitEvent<LoginSchema>) {
     formError.value = null;
-
     try {
         await $fetch('/api/auth/login', {
             method: 'POST',
             body: event.data,
         });
 
-        await navigateTo('/dashboard');
+        await navigateTo('/dashboard/upload');
     } catch (err: any) {
         formError.value = err.data?.message;
     }
@@ -80,7 +82,7 @@ async function onLogin(event: FormSubmitEvent<Schema>) {
             <UTabs :items="items">
                 <template #register>
                     <UForm
-                        :schema="schema"
+                        :schema="registerSchema"
                         :state="registerForm"
                         class="space-y-4"
                         @submit="onRegister"
@@ -109,7 +111,12 @@ async function onLogin(event: FormSubmitEvent<Schema>) {
                     </UForm>
                 </template>
                 <template #login>
-                    <UForm :schema="schema" :state="loginForm" class="space-y-4" @submit="onLogin">
+                    <UForm
+                        :schema="loginSchema"
+                        :state="loginForm"
+                        class="space-y-4"
+                        @submit="onLogin"
+                    >
                         <UFormField label="Email" name="email">
                             <UInput class="w-full" v-model="loginForm.email" />
                         </UFormField>
