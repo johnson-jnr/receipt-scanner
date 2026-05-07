@@ -29,6 +29,13 @@
       "when": 1778076935261,
       "tag": "0003_minor_proemial_gods",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1778143512418,
+      "tag": "0004_sleepy_golden_guardian",
+      "breakpoints": true
     }
   ]
 }

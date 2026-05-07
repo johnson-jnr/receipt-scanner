@@ -5,23 +5,31 @@ import type { FormSubmitEvent, TabsItem } from '@nuxt/ui';
 const schema = z.object({
     email: z.email('Invalid email'),
     password: z.string('Password is required').min(6, 'Must be at least 6 characters'),
+    name: z.string('Name is required').min(2, 'Too short!'),
 });
 
 type Schema = z.output<typeof schema>;
 
-const state = reactive<Partial<Schema>>({
+const registerForm = reactive<Partial<Schema>>({
     email: undefined,
     password: undefined,
+    name: undefined,
+});
+
+const loginForm = reactive<Partial<Schema>>({
+    email: undefined,
+    password: undefined,
+    name: undefined,
 });
 
 const items: TabsItem[] = [
     {
-        label: 'Register',
-        slot: 'register',
-    },
-    {
         label: 'Login',
         slot: 'login',
+    },
+    {
+        label: 'Register',
+        slot: 'register',
     },
 ];
 
@@ -71,26 +79,43 @@ async function onLogin(event: FormSubmitEvent<Schema>) {
             <div v-if="formError" class="text-sm text-red-500 mb-4">{{ formError }}</div>
             <UTabs :items="items">
                 <template #register>
-                    <UForm :schema="schema" :state="state" class="space-y-4" @submit="onRegister">
+                    <UForm
+                        :schema="schema"
+                        :state="registerForm"
+                        class="space-y-4"
+                        @submit="onRegister"
+                    >
+                        <UFormField label="Name" name="name">
+                            <UInput
+                                class="w-full"
+                                v-model="registerForm.name"
+                                placeholder="John Doe"
+                            />
+                        </UFormField>
+
                         <UFormField label="Email" name="email">
-                            <UInput class="w-full" v-model="state.email" />
+                            <UInput class="w-full" v-model="registerForm.email" />
                         </UFormField>
 
                         <UFormField label="Password" name="password">
-                            <UInput class="w-full" v-model="state.password" type="password" />
+                            <UInput
+                                class="w-full"
+                                v-model="registerForm.password"
+                                type="password"
+                            />
                         </UFormField>
 
                         <UButton class="w-full justify-center" type="submit"> Submit </UButton>
                     </UForm>
                 </template>
                 <template #login>
-                    <UForm :schema="schema" :state="state" class="space-y-4" @submit="onLogin">
+                    <UForm :schema="schema" :state="loginForm" class="space-y-4" @submit="onLogin">
                         <UFormField label="Email" name="email">
-                            <UInput class="w-full" v-model="state.email" />
+                            <UInput class="w-full" v-model="loginForm.email" />
                         </UFormField>
 
                         <UFormField label="Password" name="password">
-                            <UInput class="w-full" v-model="state.password" type="password" />
+                            <UInput class="w-full" v-model="loginForm.password" type="password" />
                         </UFormField>
 
                         <UButton class="w-full justify-center" type="submit"> Submit </UButton>

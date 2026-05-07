@@ -10,6 +10,7 @@ const timestamps = {
 //users table
 export const users = sqliteTable('users', {
     id: integer().primaryKey({ autoIncrement: true }),
+    name: text().notNull(),
     email: text().notNull().unique(),
     password: text().notNull(),
     ...timestamps
