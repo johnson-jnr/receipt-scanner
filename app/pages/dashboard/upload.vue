@@ -10,11 +10,13 @@
 
         <template #body>
             <UFileUpload
+                :ui="{ base: 'hover:bg-elevated/60 data-[dragging=true]:bg-elevated/60' }"
+                highlight
                 v-model="localFiles"
                 multiple
                 accept="image/*"
                 label="Drop your Recept here"
-                class="w-96 min-h-48"
+                class="w-2xl min-h-48"
                 layout="list"
             >
                 <template #files="{ files }">
@@ -61,43 +63,47 @@
                 </template>
             </UFileUpload>
 
-            <UButton
-                @click="scanReceipt"
-                class="mt-8"
-                color="neutral"
-                v-if="localFiles.length && !expenses.length"
-            >
-                Scan Receipt
-            </UButton>
-
-            <template v-if="expenses.length">
-                <UTable
-                    v-model:expanded="expanded"
-                    class="mt-5"
-                    :data="expenses"
-                    :columns="columns"
-                    :ui="{ td: 'p-1!' }"
-                >
-                    <template #expanded="{ row }">
-                        <UTable
-                            :data="row.original.items"
-                            :columns="itemColumns"
-                            :ui="{ td: 'p-1!' }"
-                            class="ml-10 my-2"
-                        />
-                    </template>
-                </UTable>
-
-                <UButton @click="saveExpense" class="mt-8" color="neutral"> Save Expense </UButton>
+            <div class="w-full">
                 <UButton
                     @click="scanReceipt"
-                    class="ml-2 mt-8"
+                    class="mt-8"
                     color="neutral"
-                    v-if="localFiles.length && expenses.length"
+                    v-if="localFiles.length && !expenses.length"
                 >
-                    Rescan
+                    Scan Receipt
                 </UButton>
-            </template>
+
+                <template v-if="expenses.length">
+                    <UTable
+                        v-model:expanded="expanded"
+                        class="mt-5"
+                        :data="expenses"
+                        :columns="columns"
+                        :ui="{ td: 'p-1!' }"
+                    >
+                        <template #expanded="{ row }">
+                            <UTable
+                                :data="row.original.items"
+                                :columns="itemColumns"
+                                :ui="{ td: 'p-1!' }"
+                                class="ml-10 my-2"
+                            />
+                        </template>
+                    </UTable>
+
+                    <UButton @click="saveExpense" class="mt-8" color="neutral">
+                        Save Expense
+                    </UButton>
+                    <UButton
+                        @click="scanReceipt"
+                        class="ml-2 mt-8"
+                        color="neutral"
+                        v-if="localFiles.length && expenses.length"
+                    >
+                        Rescan
+                    </UButton>
+                </template>
+            </div>
         </template>
     </UDashboardPanel>
 </template>
