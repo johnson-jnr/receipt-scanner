@@ -442,7 +442,7 @@ async function saveExpense() {
     isSaving.value = true;
     try {
         const updated = await $fetch(`/api/expenses/${selectedExpense.value.id}`, {
-            method: 'PATCH',
+            method: 'PUT',
             body: editForm.value,
         });
         selectedExpense.value = { ...selectedExpense.value, ...updated } as ExpenseWithItems;

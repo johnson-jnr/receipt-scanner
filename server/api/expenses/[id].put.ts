@@ -6,6 +6,11 @@ type PatchBody = Partial<NewExpense> & { items?: Partial<NewItem>[] }
 
 export default defineEventHandler(async (event) => {
     const id = Number(getRouterParam(event, 'id'))
+
+    if (!id) {
+        throw createError({ statusCode: 400, message: 'Invalid expense ID' })
+    }
+
     const { items, ...expenseData } = await readBody<PatchBody>(event)
 
     const [updated] = await db
