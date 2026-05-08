@@ -1,3 +1,23 @@
+import { openai } from '@ai-sdk/openai';
+import { generateText, Output } from 'ai';
+import { z } from 'zod';
+
+const receiptSchema = z.object({
+    merchant: z.string().nullable(),
+    address: z.string().nullable(),
+    items: z.array(
+        z.object({
+            name: z.string(),
+            price: z.number().nullable(),
+            quantity: z.number().nullable(),
+        }),
+    ),
+    total: z.number().nullable(),
+    category: z.string().nullable(),
+    date: z.string().nullable(),
+    time: z.string().nullable(),
+});
+
 export default defineEventHandler(async (event) => {
     if (process.env.MOCK_SCAN === 'true') {
         await new Promise(resolve => setTimeout(resolve, 3000));
@@ -32,9 +52,47 @@ export default defineEventHandler(async (event) => {
     }
 
     const form = await readFormData(event);
-    const response = await $fetch("http://127.0.0.1:8000/scan", {
-        method: "POST",
-        body: form,
-    });
-    return response;
+
+    // const response = await $fetch("http://127.0.0.1:8000/scan", {
+    //     method: "POST",
+    //     body: form,
+    // });
+    // return response;
+
+    const files = form.getAll('files') as File[];
+
+    const results = await Promise.all(
+        files.map(async (file) => {
+            const buffer = Buffer.from(await file.arrayBuffer());
+
+            const { output } = await generateText({
+                model: openai('gpt-4o'),
+                output: Output.object({ schema: receiptSchema }),
+                messages: [
+                    {
+                        role: 'user',
+                        content: [
+                            { type: 'image', image: buffer, mediaType: file.type || 'image/jpeg' },
+                            {
+                                type: 'text',
+                                text: [
+                                    "Extract the receipt details from this image.",
+                                    "For category, make a best guess (e.g. Groceries, Dining, Transport, Healthcare, Shopping). If unsure, return 'Uncategorized'.",
+                                    "For date, extract the date of transaction on the receipt.",
+                                    "Date format on the receipt may be MM/DD/YYYY, DD/MM/YYYY or similar — convert to ISO format (YYYY-MM-DD).",
+                                    "For time, extract the time of transaction on the receipt and return it in HH:MM format (24-hour, no seconds, no timezone offset).",
+                                    "For address, combine all address parts (street, city, state, country, postal code) into a single string.",
+                                    "If a value is not visible, return null."
+                                ].join(' '),
+                            },
+                        ],
+                    },
+                ],
+            });
+
+            return output;
+        }),
+    );
+
+    return results;
 });

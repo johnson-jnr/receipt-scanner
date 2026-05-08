@@ -10,12 +10,14 @@
         "postinstall": "nuxt prepare"
     },
     "dependencies": {
+        "@ai-sdk/openai": "^3.0.63",
         "@libsql/client": "^0.17.3",
         "@nuxt/ui": "^4.7.1",
         "@nuxthub/core": "^0.10.7",
         "@tailwindcss/vite": "^4.2.2",
         "@unovis/ts": "^1.6.5",
         "@unovis/vue": "^1.6.5",
+        "ai": "^6.0.176",
         "drizzle-kit": "^0.31.10",
         "drizzle-orm": "^0.45.2",
         "lucide-vue-next": "^1.0.0",
