@@ -290,7 +290,6 @@ const scanReceipt = async () => {
     });
 
     expenses.value = result as ExpenseWithItems[];
-    console.log(result);
 };
 
 const saveExpense = async () => {

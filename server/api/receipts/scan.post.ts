@@ -1,6 +1,5 @@
 export default defineEventHandler(async (event) => {
     if (process.env.MOCK_SCAN === 'true') {
-        console.log('towo serve');
         await new Promise(resolve => setTimeout(resolve, 3000));
         return [
             {
