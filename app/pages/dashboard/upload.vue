@@ -66,6 +66,7 @@
             <div class="w-full">
                 <UButton
                     @click="scanReceipt"
+                    :loading="isScanning"
                     class="mt-8"
                     color="neutral"
                     v-if="localFiles.length && !expenses.length"
@@ -95,6 +96,7 @@
                         Save Expense
                     </UButton>
                     <UButton
+                        :loading="isScanning"
                         @click="scanReceipt"
                         class="ml-2 mt-8"
                         color="neutral"
@@ -115,6 +117,8 @@ definePageMeta({
 
 const localFiles = ref<File[]>([]);
 const openFileModal = ref(false);
+const isScanning = ref(false);
+const isSavingExpense = ref(false);
 
 const UInput = resolveComponent('UInput');
 const UButton = resolveComponent('UButton');
@@ -125,6 +129,7 @@ import type { Expense, Item } from '~~/shared/types/db';
 type ExpenseWithItems = Expense & { items: Item[] };
 
 let expenses = ref<ExpenseWithItems[]>([]);
+const toast = useToast();
 
 const data = ref([
     { name: 'John Doe', email: 'john@example.com', amount: 100 },
@@ -281,28 +286,51 @@ function removeFileAt(index: number) {
 }
 
 const scanReceipt = async () => {
+    isScanning.value = true;
     const form = new FormData();
     localFiles.value.forEach((file) => form.append('files', file));
 
-    const result = await $fetch('/api/receipts/scan', {
-        method: 'POST',
-        body: form,
-    });
-
-    expenses.value = result as ExpenseWithItems[];
+    try {
+        const result = await $fetch('/api/receipts/scan', {
+            method: 'POST',
+            body: form,
+        });
+        expenses.value = result as ExpenseWithItems[];
+    } catch (e) {
+        console.error(e);
+        toast.add({
+            title: 'Server Error',
+            description: 'Error scanning the receipts. Please try again later.',
+            color: 'error',
+        });
+    } finally {
+        isScanning.value = false;
+    }
 };
 
 const saveExpense = async () => {
+    isSavingExpense.value = true;
     const form = new FormData();
     localFiles.value.forEach((file) => form.append('files', file));
 
-    const blobs = await $fetch('/api/receipts/upload', { method: 'POST', body: form });
+    try {
+        const blobs = await $fetch('/api/receipts/upload', { method: 'POST', body: form });
 
-    const expensesWithImages = expenses.value.map((expense, i) => ({
-        ...expense,
-        receiptImagePath: blobs[i]?.pathname ?? null,
-    }));
+        const expensesWithImages = expenses.value.map((expense, i) => ({
+            ...expense,
+            receiptImagePath: blobs[i]?.pathname ?? null,
+        }));
 
-    await $fetch('/api/expenses', { method: 'POST', body: expensesWithImages });
+        await $fetch('/api/expenses', { method: 'POST', body: expensesWithImages });
+        toast.add({
+            title: 'Success',
+            description: 'Expense saved successfully',
+            color: 'success',
+        });
+    } catch (e) {
+        console.log(e);
+    } finally {
+        isSavingExpense.value = false;
+    }
 };
 </script>
