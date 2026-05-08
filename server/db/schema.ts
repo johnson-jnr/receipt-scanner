@@ -33,7 +33,7 @@ export const expenses = sqliteTable('expenses', {
 //items table
 export const items = sqliteTable('items', {
     id: integer().primaryKey({ autoIncrement: true }),
-    expenseId: integer().notNull().references(() => expenses.id),
+    expenseId: integer().notNull().references(() => expenses.id, { onDelete: 'cascade' }),
     name: text().notNull(),
     price: real(),
     quantity: integer(),
