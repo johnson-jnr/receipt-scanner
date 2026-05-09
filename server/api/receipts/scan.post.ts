@@ -34,20 +34,7 @@ export default defineEventHandler(async (event) => {
                 category: "Dining",
                 date: "2019-12-27",
                 time: "20:26:00Z",
-            },
-            {
-                merchant: "Aroma Cafe",
-                address: "1211 Green Street, New York, NY 10005",
-                items: [
-                    { name: "Americano", price: 3.19, quantity: 1 },
-                    { name: "Almond Scone", price: 1.99, quantity: 1 },
-                    { name: "16oz Bottle Water", price: 2.99, quantity: 1 },
-                ],
-                total: 8.7,
-                category: "Dining",
-                date: "2019-12-27",
-                time: "20:26:00Z",
-            },
+            }
         ];
     }
 

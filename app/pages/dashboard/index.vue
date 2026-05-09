@@ -13,7 +13,7 @@
             <div class="p-4">
                 <UPageGrid class="lg:grid-cols-3 gap-4">
                     <UPageCard
-                        icon="i-lucide-circle-dollar-sign"
+                        icon="i-lucide-wallet"
                         title="Total Spent"
                         variant="subtle"
                         class="hover:bg-elevated transition-colors"
@@ -359,17 +359,12 @@ import { Donut } from '@unovis/ts';
 import type { Expense, Item } from '~~/shared/types/db';
 
 definePageMeta({
-    // middleware: ['auth'],
+    middleware: ['auth'],
     layout: 'dashboard',
 });
 
 const { user, clear } = useUserSession();
-const currency = computed(() => user.value!.currency);
-
-async function logout() {
-    await clear();
-    await navigateTo('/auth');
-}
+const currency = computed(() => user.value?.currency ?? '');
 
 const { data: expenses, status, error } = await useFetch('/api/expenses');
 

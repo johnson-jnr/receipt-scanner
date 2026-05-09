@@ -1,11 +1,16 @@
 <script setup lang="ts">
-defineProps<{ collapsed: boolean }>()
+defineProps<{ collapsed: boolean }>();
 
-const { user, clear } = useUserSession()
+const { user, clear } = useUserSession();
+const toast = useToast();
 
 async function logout() {
-    await clear()
-    await navigateTo('/auth')
+    await clear();
+    await navigateTo('/');
+    toast.add({
+        title: 'Logged out successfully.',
+        color: 'success',
+    });
 }
 </script>
 
@@ -32,7 +37,7 @@ async function logout() {
     >
         <UButton
             v-bind="{
-                label: collapsed ? undefined : user?.name ?? 'Account',
+                label: collapsed ? undefined : (user?.name ?? 'Account'),
                 trailingIcon: collapsed ? undefined : 'i-lucide-chevrons-up-down',
             }"
             variant="ghost"

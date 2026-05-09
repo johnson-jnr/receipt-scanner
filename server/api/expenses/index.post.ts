@@ -2,11 +2,7 @@ import { db, schema } from '@nuxthub/db'
 import type { NewExpense, NewItem } from '~~/shared/types/db'
 
 export default defineEventHandler(async (event) => {
-    const { user } = await getUserSession(event)
-
-    if (!user) {
-        throw createError({ statusCode: 401, message: 'Unauthorized' })
-    }
+    const { user } = await requireUserSession(event)
 
     const expenses = await readBody<(NewExpense & { items: NewItem[] })[]>(event)
 

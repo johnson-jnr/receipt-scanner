@@ -1,10 +1,11 @@
 import { db, schema } from '@nuxthub/db'
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import type { NewExpense, NewItem } from '~~/shared/types/db'
 
 type PatchBody = Partial<NewExpense> & { items?: Partial<NewItem>[] }
 
 export default defineEventHandler(async (event) => {
+    const { user } = await requireUserSession(event)
     const id = Number(getRouterParam(event, 'id'))
 
     if (!id) {
@@ -16,7 +17,7 @@ export default defineEventHandler(async (event) => {
     const [updated] = await db
         .update(schema.expenses)
         .set(expenseData)
-        .where(eq(schema.expenses.id, id))
+        .where(and(eq(schema.expenses.id, id), eq(schema.expenses.userId, user.id)))
         .returning()
 
     if (!updated) {

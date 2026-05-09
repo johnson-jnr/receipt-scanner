@@ -1,6 +1,7 @@
 import { db } from '@nuxthub/db'
 
 export default defineEventHandler(async (event) => {
+    const { user } = await requireUserSession(event)
     const id = Number(getRouterParam(event, 'id'))
 
     if (!id) {
@@ -8,7 +9,7 @@ export default defineEventHandler(async (event) => {
     }
 
     const expense = await db.query.expenses.findFirst({
-        where: (expenses, { eq }) => eq(expenses.id, id),
+        where: (expenses, { eq, and }) => and(eq(expenses.id, id), eq(expenses.userId, user.id)),
         with: { items: true },
     })
 

@@ -8,6 +8,7 @@ export function getCurrencyOptions() {
 }
 
 export function formatCurrency(amount: number, currencyCode: string) {
+    if (!currencyCode) return;
     return new Intl.NumberFormat(undefined, {
         style: 'currency',
         currency: currencyCode,
