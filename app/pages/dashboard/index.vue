@@ -26,7 +26,7 @@
                         }"
                     >
                         <span class="text-2xl font-semibold text-highlighted">
-                            ${{ totalSpent.toFixed(2) }}
+                            {{ formatCurrency(totalSpent, currency) }}
                         </span>
                     </UPageCard>
 
@@ -91,7 +91,7 @@
                             <li v-for="item in categoryData" :key="item.category" class="text-sm">
                                 <span class="text-default font-medium">{{ item.category }}</span>
                                 <span class="text-muted">
-                                    — ${{ item.total.toFixed(2) }} ({{
+                                    — {{ formatCurrency(item.total, currency) }} ({{
                                         Math.round((item.total / totalSpent) * 100)
                                     }}%)
                                 </span>
@@ -244,7 +244,7 @@
                                     <p v-else class="text-2xl font-bold text-highlighted">
                                         {{
                                             selectedExpense?.total != null
-                                                ? `$${selectedExpense.total.toFixed(2)}`
+                                                ? formatCurrency(selectedExpense.total, currency)
                                                 : '—'
                                         }}
                                     </p>
@@ -323,7 +323,7 @@
                                             <span class="text-muted">
                                                 {{
                                                     item.price != null
-                                                        ? `$${item.price.toFixed(2)}`
+                                                        ? formatCurrency(item.price, currency)
                                                         : '—'
                                                 }}
                                             </span>
@@ -364,6 +364,7 @@ definePageMeta({
 });
 
 const { user, clear } = useUserSession();
+const currency = computed(() => user.value!.currency);
 
 async function logout() {
     await clear();
@@ -526,7 +527,7 @@ const expenseColumns = [
             return h(
                 'div',
                 { class: 'text-right font-medium' },
-                total != null ? `$${total.toFixed(2)}` : '—',
+                total != null ? formatCurrency(total, currency.value) : '—',
             );
         },
     },

@@ -43,6 +43,13 @@
       "when": 1778236196616,
       "tag": "0005_lean_tusk",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1778329905092,
+      "tag": "0006_wet_valeria_richards",
+      "breakpoints": true
     }
   ]
 }

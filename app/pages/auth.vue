@@ -9,15 +9,19 @@ const loginSchema = z.object({
 
 const registerSchema = loginSchema.extend({
     name: z.string('Name is required').min(2, 'Too short!'),
+    currency: z.string('Currency is required'),
 });
 
 type LoginSchema = z.output<typeof loginSchema>;
 type RegisterSchema = z.output<typeof registerSchema>;
 
+const currencyOptions = getCurrencyOptions();
+
 const registerForm = reactive<Partial<RegisterSchema>>({
     email: undefined,
     password: undefined,
     name: undefined,
+    currency: undefined,
 });
 
 const loginForm = reactive<Partial<LoginSchema>>({
@@ -104,6 +108,15 @@ async function onLogin(event: FormSubmitEvent<LoginSchema>) {
                                 class="w-full"
                                 v-model="registerForm.password"
                                 type="password"
+                            />
+                        </UFormField>
+
+                        <UFormField label="Currency" name="currency">
+                            <USelectMenu
+                                v-model="registerForm.currency"
+                                :items="currencyOptions"
+                                value-key="code"
+                                class="w-full"
                             />
                         </UFormField>
 

@@ -3,6 +3,7 @@ declare module '#auth-utils' {
         id: number
         email: string
         name: string
+        currency: string
     }
 }
 

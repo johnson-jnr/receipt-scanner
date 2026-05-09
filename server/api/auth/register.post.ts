@@ -2,7 +2,7 @@ import { db, schema } from '@nuxthub/db'
 import { eq } from 'drizzle-orm'
 
 export default defineEventHandler(async (event) => {
-    const { email, password, name } = await readBody<{ email: string; password: string, name: string }>(event)
+    const { email, password, name, currency } = await readBody<{ email: string; password: string; name: string; currency: string }>(event)
 
     const existing = await db.query.users.findFirst({
         where: eq(schema.users.email, email),
@@ -16,15 +16,15 @@ export default defineEventHandler(async (event) => {
 
     const [user] = await db
         .insert(schema.users)
-        .values({ name, email, password: hashed })
-        .returning({ id: schema.users.id, email: schema.users.email, name: schema.users.name })
+        .values({ name, email, password: hashed, currency })
+        .returning({ id: schema.users.id, email: schema.users.email, name: schema.users.name, currency: schema.users.currency })
 
     if (!user) {
         throw createError({ statusCode: 500, message: 'Failed to create user' })
     }
 
     await setUserSession(event, {
-        user: { id: user.id, email: user.email, name: user.name },
+        user: { id: user.id, email: user.email, name: user.name, currency: user.currency },
     })
 
     return user
