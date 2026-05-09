@@ -122,7 +122,7 @@
                 </UCard>
             </div>
 
-            <USlideover v-model:open="isSlideoverOpen" :ui="{ content: 'max-w-lg' }">
+            <USlideover v-model:open="isSlideoverOpen" :ui="{ content: 'max-w-xl' }">
                 <template #header="{ close }">
                     <div class="w-full flex items-center justify-between shrink-0">
                         <p class="text-base font-semibold text-highlighted truncate">

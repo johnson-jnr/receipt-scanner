@@ -9,102 +9,178 @@
         </template>
 
         <template #body>
-            <UFileUpload
-                :ui="{ base: 'hover:bg-elevated/60 data-[dragging=true]:bg-elevated/60' }"
-                highlight
-                v-model="localFiles"
-                multiple
-                accept="image/*"
-                label="Drop your Recept here"
-                class="w-2xl min-h-48"
-                layout="list"
-            >
-                <template #files="{ files }">
-                    <UModal v-for="(file, index) in files" :key="file.name">
+            <div class="min-w-4xl mx-auto">
+                <!-- Per-file cards -->
+                <div v-if="localFiles.length" class="mt-4 space-y-4">
+                    <div
+                        v-for="(file, index) in localFiles"
+                        :key="index"
+                        class="border border-default rounded-xl overflow-hidden"
+                    >
+                        <!-- Card header: preview + file info + remove -->
                         <div
-                            class="hover:bg-neutral-50 relative text-xs px-2.5 py-1.5 gap-1.5 min-w-0 flex items-center border border-default rounded-md w-full"
+                            class="flex items-center gap-3 px-4 py-3 bg-elevated/30 border-b border-default cursor-pointer select-none"
+                            :class="{ 'border-b-0': collapsedCards.has(index) }"
+                            @click="toggleCard(index)"
                         >
-                            <UAvatar
-                                :as="{ img: 'img' }"
-                                :src="createObjectUrl(file)"
-                                :icon="'i-lucide-file'"
-                                data-slot="fileLeadingAvatar"
+                            <UButton
+                                color="neutral"
+                                variant="ghost"
+                                icon="i-lucide-chevron-down"
+                                square
+                                :ui="{
+                                    leadingIcon: [
+                                        'transition-transform duration-200',
+                                        !collapsedCards.has(index) ? 'rotate-180' : '',
+                                    ],
+                                }"
+                                :aria-label="collapsedCards.has(index) ? 'Expand' : 'Collapse'"
+                                @click.stop="toggleCard(index)"
                             />
 
-                            <div data-slot="fileWrapper" class="flex flex-col min-w-0 flex-1">
-                                <span data-slot="fileName" class="truncate text-sm font-medium">
-                                    {{ file.name }}
-                                </span>
-                                <span data-slot="fileSize" class="text-xs text-muted">
-                                    {{ formatFileSize(file.size) }}
-                                </span>
+                            <UModal>
+                                <img
+                                    :src="createObjectUrl(file)"
+                                    class="w-10 h-10 object-cover rounded cursor-pointer"
+                                    alt=""
+                                    @click.stop
+                                />
+                                <template #content>
+                                    <div class="h-80 m-4">
+                                        <img
+                                            :src="createObjectUrl(file)"
+                                            class="object-contain w-full h-full"
+                                            alt=""
+                                        />
+                                    </div>
+                                </template>
+                            </UModal>
+
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-medium truncate">{{ file.name }}</p>
+                                <p class="text-xs text-muted">{{ formatFileSize(file.size) }}</p>
                             </div>
 
                             <UButton
                                 color="neutral"
-                                variant="link"
-                                :trailing-icon="'i-lucide-x'"
+                                variant="ghost"
+                                icon="i-lucide-x"
+                                square
                                 :aria-label="`Remove ${file.name}`"
-                                data-slot="fileTrailingButton"
-                                @click.stop.prevent="removeFileAt(index)"
+                                @click.stop="removeFileAt(index)"
                             />
                         </div>
 
-                        <template #content>
-                            <div class="h-72 m-4">
-                                <img
-                                    :src="createObjectUrl(file)"
-                                    class="object-contain w-full h-full"
-                                    alt=""
+                        <!-- Scanned expense fields -->
+                        <div
+                            v-if="expenses[index] && !collapsedCards.has(index)"
+                            class="p-4 space-y-4"
+                        >
+                            <div class="grid grid-cols-3 gap-3">
+                                <div class="flex flex-col gap-1">
+                                    <span class="text-xs text-muted font-medium">Merchant</span>
+                                    <UInput v-model="expenses[index].merchant" class="w-full" />
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <span class="text-xs text-muted font-medium">Category</span>
+                                    <UInput v-model="expenses[index].category" class="w-full" />
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <span class="text-xs text-muted font-medium">Address</span>
+                                    <UInput v-model="expenses[index].address" class="w-full" />
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <span class="text-xs text-muted font-medium">Date</span>
+                                    <UInput
+                                        v-model="expenses[index].date"
+                                        type="date"
+                                        class="w-full"
+                                    />
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <span class="text-xs text-muted font-medium">Time</span>
+                                    <UInput
+                                        :model-value="expenses[index].time?.slice(0, 5)"
+                                        type="time"
+                                        class="w-full"
+                                        @update:model-value="
+                                            (v: string) => (expenses[index]!.time = v)
+                                        "
+                                    />
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <span class="text-xs text-muted font-medium">Total</span>
+                                    <UInput
+                                        v-model.number="expenses[index].total"
+                                        type="number"
+                                        class="w-full"
+                                    />
+                                </div>
+                            </div>
+
+                            <!-- Line items -->
+                            <div v-if="expenses[index].items?.length">
+                                <p class="text-xs text-muted font-medium mb-1">
+                                    Items ({{ expenses[index].items.length }})
+                                </p>
+                                <UTable
+                                    :data="expenses[index].items"
+                                    :columns="itemColumns"
+                                    :ui="{ td: 'p-1!' }"
                                 />
                             </div>
-                        </template>
-                    </UModal>
-                </template>
-            </UFileUpload>
+                        </div>
 
-            <div class="w-full">
-                <UButton
-                    @click="scanReceipt"
-                    :loading="isScanning"
-                    class="mt-8"
-                    color="neutral"
-                    v-if="localFiles.length && !expenses.length"
+                        <!-- Not yet scanned / scanning state -->
+                        <div
+                            v-else-if="!collapsedCards.has(index)"
+                            class="px-4 py-6 text-center text-sm text-muted"
+                        >
+                            <span v-if="isScanning">Scanning…</span>
+                            <span v-else>Not yet scanned</span>
+                        </div>
+                    </div>
+                </div>
+
+                <UFileUpload
+                    :ui="{
+                        base: 'mt-6 bg-elevated/30 hover:bg-elevated/60 data-[dragging=true]:bg-elevated/60',
+                    }"
+                    icon="i-lucide-image"
+                    highlight
+                    v-model="localFiles"
+                    multiple
+                    :preview="false"
+                    accept="image/*"
+                    label="Drop your Receipts here"
+                    class="w-full min-h-44"
+                    layout="list"
                 >
-                    Scan Receipt
-                </UButton>
+                    <!-- <template #files></template> -->
+                </UFileUpload>
 
-                <template v-if="expenses.length">
-                    <UTable
-                        v-model:expanded="expanded"
-                        class="mt-5"
-                        :data="expenses"
-                        :columns="columns"
-                        :ui="{ td: 'p-1!' }"
-                    >
-                        <template #expanded="{ row }">
-                            <UTable
-                                :data="row.original.items"
-                                :columns="itemColumns"
-                                :ui="{ td: 'p-1!' }"
-                                class="ml-10 my-2"
-                            />
-                        </template>
-                    </UTable>
-
-                    <UButton @click="saveExpense" class="mt-8" color="neutral">
-                        Save Expense
-                    </UButton>
+                <!-- Actions -->
+                <div class="flex gap-2 mt-6">
                     <UButton
+                        v-if="localFiles.length && !expenses.length"
                         :loading="isScanning"
                         @click="scanReceipt"
-                        class="ml-2 mt-8"
-                        color="neutral"
-                        v-if="localFiles.length && expenses.length"
                     >
-                        Rescan
+                        Scan Receipt
                     </UButton>
-                </template>
+                    <template v-if="expenses.length">
+                        <UButton :loading="isSavingExpense" @click="saveExpense">
+                            Save Expense
+                        </UButton>
+                        <UButton
+                            v-if="localFiles.length"
+                            :loading="isScanning"
+                            @click="scanReceipt"
+                        >
+                            Rescan
+                        </UButton>
+                    </template>
+                </div>
             </div>
         </template>
     </UDashboardPanel>
@@ -116,127 +192,26 @@ definePageMeta({
 });
 
 const localFiles = ref<File[]>([]);
-const openFileModal = ref(false);
 const isScanning = ref(false);
 const isSavingExpense = ref(false);
+const collapsedCards = reactive(new Set<number>());
+
+function toggleCard(index: number) {
+    if (collapsedCards.has(index)) {
+        collapsedCards.delete(index);
+    } else {
+        collapsedCards.add(index);
+    }
+}
 
 const UInput = resolveComponent('UInput');
-const UButton = resolveComponent('UButton');
 
-const expanded = ref({});
 import type { Expense, Item } from '~~/shared/types/db';
 
 type ExpenseWithItems = Expense & { items: Item[] };
 
-let expenses = ref<ExpenseWithItems[]>([]);
+const expenses = ref<ExpenseWithItems[]>([]);
 const toast = useToast();
-
-const data = ref([
-    { name: 'John Doe', email: 'john@example.com', amount: 100 },
-    { name: 'Jane Smith', email: 'jane@example.com', amount: 200 },
-]);
-
-const columns = [
-    {
-        id: 'expand',
-        cell: ({ row }: { row: any }) =>
-            h(UButton, {
-                color: 'neutral',
-                variant: 'ghost',
-                icon: 'i-lucide-chevron-down',
-                square: true,
-                'aria-label': 'Expand',
-                ui: {
-                    leadingIcon: [
-                        'transition-transform',
-                        row.getIsExpanded() ? 'duration-200 rotate-180' : '',
-                    ],
-                },
-                onClick: () => row.toggleExpanded(),
-            }),
-    },
-    {
-        accessorKey: 'merchant',
-        header: 'Merchant',
-        cell: ({ row }: { row: { original: { merchant: string | null } } }) => {
-            return h(UInput, {
-                class: 'w-full',
-                modelValue: row.original.merchant,
-                'onUpdate:modelValue': (value: string) => {
-                    row.original.merchant = value;
-                },
-            });
-        },
-    },
-    {
-        accessorKey: 'category',
-        header: 'Category',
-        cell: ({ row }: { row: { original: { category: string | null } } }) => {
-            return h(UInput, {
-                class: 'w-full',
-                modelValue: row.original.category,
-                'onUpdate:modelValue': (value: string) => {
-                    row.original.category = value;
-                },
-            });
-        },
-    },
-    {
-        accessorKey: 'address',
-        header: 'Address',
-        cell: ({ row }: { row: { original: { address: string | null } } }) => {
-            return h(UInput, {
-                class: 'w-full',
-                modelValue: row.original.address,
-                'onUpdate:modelValue': (value: string) => {
-                    row.original.address = value;
-                },
-            });
-        },
-    },
-    {
-        accessorKey: 'date',
-        header: 'Date',
-        cell: ({ row }: { row: { original: { date: string | null } } }) => {
-            return h(UInput, {
-                class: 'w-full',
-                modelValue: row.original.date,
-                type: 'date',
-                'onUpdate:modelValue': (value: string) => {
-                    row.original.date = value;
-                },
-            });
-        },
-    },
-    {
-        accessorKey: 'time',
-        header: 'Time',
-        cell: ({ row }: { row: { original: { time: string | null } } }) => {
-            return h(UInput, {
-                class: 'w-full',
-                modelValue: row.original.time?.slice(0, 5),
-                type: 'time',
-                'onUpdate:modelValue': (value: string) => {
-                    row.original.time = value;
-                },
-            });
-        },
-    },
-    {
-        accessorKey: 'total',
-        header: 'Total',
-        cell: ({ row }: { row: { original: { total: number | null } } }) => {
-            return h(UInput, {
-                class: 'w-full',
-                modelValue: row.original.total,
-                type: 'number',
-                'onUpdate:modelValue': (value: string | number) => {
-                    row.original.total = Number(value);
-                },
-            });
-        },
-    },
-];
 
 const itemColumns = [
     {
@@ -280,8 +255,9 @@ const itemColumns = [
 ];
 
 function removeFileAt(index: number) {
-    if (localFiles.value.length) {
-        localFiles.value.splice(index, 1);
+    localFiles.value.splice(index, 1);
+    if (expenses.value.length > index) {
+        expenses.value.splice(index, 1);
     }
 }
 
@@ -327,6 +303,7 @@ const saveExpense = async () => {
             description: 'Expense saved successfully',
             color: 'success',
         });
+        await navigateTo('/dashboard');
     } catch (e) {
         console.log(e);
     } finally {
