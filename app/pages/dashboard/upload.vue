@@ -170,14 +170,14 @@
                     </UButton>
                     <template v-if="expenses.length">
                         <UButton
-                            class="w-28 justify-center"
+                            class="min-w-28 justify-center"
                             :loading="isSavingExpense"
                             @click="saveExpense"
                         >
                             Save Expense
                         </UButton>
                         <UButton
-                            class="w-28 justify-center"
+                            class="min-w-28 justify-center"
                             v-if="localFiles.length"
                             :loading="isScanning"
                             @click="scanReceipt"
