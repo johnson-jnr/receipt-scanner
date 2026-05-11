@@ -13,7 +13,26 @@ export default defineNuxtConfig({
             driver: 'fs',
             dir: '.data/blob'
         },
-        kv: true
+        kv: true,
+    },
+    $production: {
+        hub: {
+            kv: {
+                driver: 'cloudflare-kv-binding',
+                namespaceId: process.env.HUB_KV_NAMESPACE_ID
+            },
+            blob: {
+                driver: 'cloudflare-r2',
+                bucketName: process.env.HUB_BLOB_BUCKET_NAME,
+                binding: 'BLOB'
+            },
+            db: {
+                dialect: 'sqlite',
+                casing: 'snake_case',
+                driver: 'd1',
+                connection: { databaseId: process.env.HUB_DB_DATABASE_ID }
+            },
+        }
     },
     nitro: {
         experimental: {
