@@ -72,7 +72,9 @@
             <div class="px-4 pb-4">
                 <UCard :ui="{ root: 'overflow-auto', body: 'px-0! py-0!' }">
                     <template #header>
-                        <p class="text-base font-semibold text-highlighted">Spending by Category</p>
+                        <p class="text-base font-semibold text-highlighted">
+                            Top Spending Categories
+                        </p>
                     </template>
 
                     <div class="flex items-center justify-center gap-8 px-4 py-4">
@@ -386,9 +388,16 @@ const categoryData = computed<CategoryData[]>(() => {
         {} as Record<string, number>,
     );
 
-    return Object.entries(totals)
+    const sorted = Object.entries(totals)
         .map(([category, total]) => ({ category, total }))
         .sort((a, b) => b.total - a.total);
+
+    if (sorted.length <= 4) return sorted;
+
+    const top3 = sorted.slice(0, 3);
+    const othersTotal = sorted.slice(3).reduce((acc, curr) => acc + curr.total, 0);
+
+    return [...top3, { category: 'Others', total: othersTotal }];
 });
 
 const topCategory = computed(() => categoryData.value[0]?.category ?? null);
