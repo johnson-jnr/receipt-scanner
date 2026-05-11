@@ -13,7 +13,11 @@ async function checkScanRateLimit(event: H3Event) {
         throw createError({ statusCode: 429, message: 'Scan limit reached (3 per day)' })
     }
 
-    await kv.set(key, count + 1, { ttl: 86400 }) // TTL equals to 24 hours
+    if (count === 0) {
+        await kv.set(key, 1, { ttl: 86400 })
+    } else {
+        await kv.set(key, count + 1)
+    }
 }
 
 const receiptSchema = z.object({
