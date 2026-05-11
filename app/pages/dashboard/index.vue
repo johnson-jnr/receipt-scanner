@@ -411,6 +411,8 @@ const topCategoryPercent = computed(() => {
 type EditItem = { id?: number; name: string; price: number | null; quantity: number | null };
 type ExpenseWithItems = Expense & { items: Item[] };
 
+const toast = useToast();
+
 const isSlideoverOpen = ref(false);
 const selectedExpense = ref<ExpenseWithItems | null>(null);
 const isEditing = ref(false);
@@ -453,6 +455,10 @@ async function saveExpense() {
         expenses.value = expenses.value.map((e) =>
             e.id === selectedExpense.value!.id ? { ...e, ...updated } : e,
         );
+        toast.add({ title: 'Expense updated', color: 'success' });
+    } catch (e) {
+        toast.add({ title: 'Failed to update expense', color: 'error' });
+        console.error(e);
     } finally {
         isEditing.value = false;
         isSaving.value = false;
@@ -465,8 +471,10 @@ async function deleteExpense() {
     try {
         await $fetch(`/api/expenses/${selectedExpense.value.id}`, { method: 'DELETE' });
         expenses.value = expenses.value.filter((e) => e.id !== selectedExpense.value!.id);
+        toast.add({ title: 'Expense deleted', color: 'success' });
     } catch (e) {
-        console.error('Eroor deleting expense', e);
+        toast.add({ title: 'Failed to delete expense', color: 'error' });
+        console.error(e);
     } finally {
         isSlideoverOpen.value = false;
         selectedExpense.value = null;
