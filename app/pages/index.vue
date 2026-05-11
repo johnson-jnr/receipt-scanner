@@ -45,6 +45,24 @@ const toast = useToast();
 const formError = ref<string | null>(null);
 const loadingSignin = ref(false);
 const loadingSignup = ref(false);
+const loadingDemo = ref(false);
+
+async function onDemo() {
+    loadingDemo.value = true;
+    try {
+        await $fetch('/api/auth/demo', { method: 'POST' });
+        await fetchSession();
+        await navigateTo('/dashboard');
+    } catch {
+        toast.add({
+            title: 'Demo unavailable',
+            description: 'Please try again later.',
+            color: 'error',
+        });
+    } finally {
+        loadingDemo.value = false;
+    }
+}
 
 async function onRegister(event: FormSubmitEvent<RegisterSchema>) {
     loadingSignup.value = true;
@@ -167,7 +185,7 @@ async function onLogin(event: FormSubmitEvent<LoginSchema>) {
                 </template>
             </UTabs>
             <div class="mt-4 text-center">
-                <UButton variant="ghost" @click="navigateTo('/dashboard')">See Demo</UButton>
+                <UButton variant="ghost" :loading="loadingDemo" @click="onDemo">See Demo</UButton>
             </div>
         </div>
     </div>
