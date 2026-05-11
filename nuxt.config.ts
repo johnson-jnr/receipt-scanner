@@ -40,6 +40,13 @@ export default defineNuxtConfig({
         },
         scheduledTasks: {
             '0 0 * * *': ['db:seed']
+        },
+        cloudflare: {
+            wrangler: {
+                triggers: {
+                    crons: ['0 0 * * *']
+                }
+            }
         }
     },
     devtools: { enabled: true },
