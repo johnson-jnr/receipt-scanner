@@ -6,11 +6,8 @@ const toast = useToast();
 
 async function logout() {
     await clear();
-    await navigateTo('/');
-    toast.add({
-        title: 'Logged out successfully.',
-        color: 'success',
-    });
+    toast.add({ title: 'Logged out successfully.', color: 'success' });
+    navigateTo('/');
 }
 </script>
 
