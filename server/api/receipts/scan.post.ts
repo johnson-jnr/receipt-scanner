@@ -1,6 +1,20 @@
 import { openai } from '@ai-sdk/openai';
 import { generateText, Output } from 'ai';
 import { z } from 'zod';
+import { kv } from '@nuxthub/kv';
+import type { H3Event } from 'h3';
+
+async function checkScanRateLimit(event: H3Event) {
+    const ip = getRequestIP(event, { xForwardedFor: true }) ?? 'unknown'
+    const key = `ratelimit:scan:${ip}`
+    const count = await kv.get<number>(key) ?? 0;
+
+    if (count >= 3) {
+        throw createError({ statusCode: 429, message: 'Scan limit reached (3 per day)' })
+    }
+
+    await kv.set(key, count + 1, { ttl: 86400 }) // TTL equals to 24 hours
+}
 
 const receiptSchema = z.object({
     merchant: z.string().nullable(),
@@ -19,6 +33,8 @@ const receiptSchema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
+    await checkScanRateLimit(event);
+
     if (process.env.MOCK_SCAN === 'true') {
         await new Promise(resolve => setTimeout(resolve, 3000));
         return [

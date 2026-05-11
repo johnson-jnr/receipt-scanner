@@ -12,7 +12,8 @@ export default defineNuxtConfig({
         blob: {
             driver: 'fs',
             dir: '.data/blob'
-        }
+        },
+        kv: true
     },
     nitro: {
         experimental: {

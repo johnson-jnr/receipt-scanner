@@ -169,10 +169,15 @@
                         Scan Receipt
                     </UButton>
                     <template v-if="expenses.length">
-                        <UButton :loading="isSavingExpense" @click="saveExpense">
+                        <UButton
+                            class="w-28 justify-center"
+                            :loading="isSavingExpense"
+                            @click="saveExpense"
+                        >
                             Save Expense
                         </UButton>
                         <UButton
+                            class="w-28 justify-center"
                             v-if="localFiles.length"
                             :loading="isScanning"
                             @click="scanReceipt"
@@ -272,11 +277,13 @@ const scanReceipt = async () => {
             body: form,
         });
         expenses.value = result as ExpenseWithItems[];
-    } catch (e) {
-        console.error(e);
+    } catch (e: any) {
+        const isRateLimit = e?.response?.status === 429;
         toast.add({
-            title: 'Server Error',
-            description: 'Error scanning the receipts. Please try again later.',
+            title: isRateLimit ? 'Sorry, Limit reached' : 'Server Error',
+            description: isRateLimit
+                ? e.data?.message
+                : 'Error scanning the receipts. Please try again later.',
             color: 'error',
         });
     } finally {
