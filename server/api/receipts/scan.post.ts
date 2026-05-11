@@ -5,7 +5,7 @@ import { kv } from '@nuxthub/kv';
 import type { H3Event } from 'h3';
 
 async function checkScanRateLimit(event: H3Event) {
-    const ip = getRequestIP(event, { xForwardedFor: true }) ?? 'unknown'
+    const ip = getRequestHeader(event, 'cf-connecting-ip') ?? getRequestIP(event, { xForwardedFor: true }) ?? 'unknown'
     const key = `ratelimit:scan:${ip}`
     const count = await kv.get<number>(key) ?? 0;
 
