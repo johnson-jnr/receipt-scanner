@@ -3,6 +3,7 @@
 ![Product demo](public/product.gif)
 
 Built using Nuxt and NuxtHub, deployed on Cloudflare.
+**[Live Demo](https://receipt-scanner.craftmotion.workers.dev)**
 
 ## Features
 
