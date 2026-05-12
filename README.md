@@ -1,75 +1,65 @@
-# Nuxt Minimal Starter
+# Receipt Scanner and Expense Tracker
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+![Product demo](public/product.gif)
 
-## Setup
+Built using Nuxt and NuxtHub, deployed on Cloudflare.
 
-Make sure to install dependencies:
+## Features
+
+- Scan and extract data from receipts using AI
+- Track expenses
+- Expense analysis
+
+## Tech Stack
+
+| Area | Technology |
+|---|---|
+| Authentication | nuxt-auth-utils |
+| Database | Cloudflare D1, Drizzle ORM |
+| Storage | Cloudflare R2, KV |
+| AI | Vercel AI SDK |
+| UI | Nuxt UI |
+
+## Local Development
+
+### 1. Install dependencies
 
 ```bash
-# npm
-npm install
-
-# pnpm
 pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
 ```
 
-## Development Server
+### 2. Configure environment variables
 
-Start the development server on `http://localhost:3000`:
+Copy `.env.example` to `.env` and fill in the values:
 
 ```bash
-# npm
-npm run dev
+cp .env.example .env
+```
 
-# pnpm
+```env
+# Skip AI scanning and return mock data for testing
+MOCK_SCAN=
+
+# Auth session secret (generate with: openssl rand -base64 32)
+NUXT_SESSION_PASSWORD=
+
+APP_SECRET=
+
+# AI — OpenAI-compatible key used by Vercel AI SDK
+OPENAI_API_KEY=
+
+# Cloudflare resources
+HUB_KV_NAMESPACE_ID=
+HUB_BLOB_BUCKET_NAME=
+HUB_DB_DATABASE_ID=
+```
+
+> In development, the app uses a local SQLite database and file-based blob storage — `HUB_*` variables are only required for production Cloudflare deployments.
+
+### 3. Run the development server
+
+```bash
 pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
 ```
 
-## Production
-
-Build the application for production:
-
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+The app will be available at `http://localhost:3000`.
